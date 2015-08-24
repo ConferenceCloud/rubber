@@ -3,38 +3,38 @@ namespace :rubber do
 
 		rubber.allow_optional_tasks(self)
 
-		after "rubber:install_packages", "rubber:nsq:install"
-
-    task :install, :roles => :nsq_lookupd do
-      rubber.sudo_script 'install_redis', <<-ENDSCRIPT
-        if ! nsqlookupd --version | grep "#{rubber_env.nsq_version}" &> /dev/null; then
-          # Fetch the sources.
-          wget https://s3.amazonaws.com/bitly-downloads/nsq/nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
-          tar -zxf nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
-
-          # Move the binaries to system folder.
-          cd nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}
-          cd bin
-          cp * /usr/bin
-          
-
-          # create the user
-          if ! id nsq &> /dev/null; then adduser --system --group nsq; fi
-
-          # Clean up after ourselves.
-          cd ../..
-          rm -rf nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}
-          rm nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
-        fi
-      ENDSCRIPT
-    end
-
 		namespace :lookupd do
 			rubber.allow_optional_tasks(self)
 
 			before "deploy:stop", "rubber:nsq:lookupd:stop"
 			after "deploy:start", "rubber:nsq:lookupd:start"
 			after "deploy:restart", "rubber:nsq:lookupd:restart"
+
+			after "rubber:install_packages", "rubber:nsq:lookupd:install"
+
+	    task :install, :roles => :nsqlookupd do
+	      rubber.sudo_script 'install_redis', <<-ENDSCRIPT
+	        if ! nsqlookupd --version | grep "#{rubber_env.nsq_version}" &> /dev/null; then
+	          # Fetch the sources.
+	          wget https://s3.amazonaws.com/bitly-downloads/nsq/nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
+	          tar -zxf nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
+
+	          # Move the binaries to system folder.
+	          cd nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}
+	          cd bin
+	          cp * /usr/bin
+	          
+
+	          # create the user
+	          if ! id nsq &> /dev/null; then adduser --system --group nsq; fi
+
+	          # Clean up after ourselves.
+	          cd ../..
+	          rm -rf nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}
+	          rm nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
+	        fi
+	      ENDSCRIPT
+	    end
 
 			task :bootstrap, :roles => :nsqlookupd do
         exists = capture("echo $(ls /etc/nsqlookupd.conf 2> /dev/null)")
