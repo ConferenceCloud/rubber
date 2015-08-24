@@ -13,7 +13,7 @@ namespace :rubber do
 			after "rubber:install_packages", "rubber:nsq:lookupd:install"
 
 	    task :install, :roles => :nsqlookupd do
-	      rubber.sudo_script 'install_redis', <<-ENDSCRIPT
+	      rubber.sudo_script 'install_nsqlookupd', <<-ENDSCRIPT
 	        if ! nsqlookupd --version | grep "#{rubber_env.nsq_version}" &> /dev/null; then
 	          # Fetch the sources.
 	          wget https://s3.amazonaws.com/bitly-downloads/nsq/nsq-#{rubber_env.nsq_version}.linux-amd64.go#{rubber_env.nsq_go_version}.tar.gz
