@@ -36,6 +36,8 @@ namespace :rubber do
 	      ENDSCRIPT
 	    end
 
+	    after "rubber:bootstrap", "rubber:nsq:lookupd:bootstrap"
+
 			task :bootstrap, :roles => :nsqlookupd do
         exists = capture("echo $(ls /etc/nsqlookupd.conf 2> /dev/null)")
         if exists.strip.size == 0
