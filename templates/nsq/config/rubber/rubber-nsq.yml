@@ -1,0 +1,27 @@
+# Note the nsq version and the go version MUST match
+# the releases found at https://github.com/bitly/nsq/releases
+nsq_version: 0.3.5
+nsq_go_version: 1.4.2
+
+nsq_dir: /usr/bin
+nsq_data_dir: /mnt/nsq/
+nsq_conf_file: /etc/nsq.conf
+nsq_log_file: /var/log/nsq.log
+nsq_admin_log_file: /var/log/nsqadmin.log
+
+nsq_pid_file: /var/run/nsq.pid
+nsq_admin_pid_file: /var/run/nsq_admin.pid
+
+nsq_tcp_port: 4150
+nsq_http_port: 4151
+nsq_admin_port: 4171
+
+web_tools_proxies:
+  nsq:
+    role: nsq_admin
+    port: "#{nsq_admin_port}"
+    path: /
+
+role_dependencies:
+  web_tools: [nsq_admin]
+  app: [nsqd]
