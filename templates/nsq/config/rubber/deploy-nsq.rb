@@ -32,10 +32,6 @@ namespace :rubber do
 		namespace :daemon do
 			rubber.allow_optional_tasks(self)
 
-			before "deploy:stop", "rubber:nsq:daemon:stop"
-			after "deploy:start", "rubber:nsq:daemon:start"
-			after "deploy:restart", "rubber:nsq:daemon:restart"
-
 			after "rubber:bootstrap", "rubber:nsq:daemon:bootstrap"
 
       task :bootstrap, :roles => :nsqd do
@@ -43,10 +39,11 @@ namespace :rubber do
         if exists.strip.size == 0
           rubber.update_code_for_bootstrap
           rubber.run_config(:file => "role/nsqd/", :force => true, :deploy_path => release_path)
+          rsudo "mkdir -p /mnt/nsq"
 
-          restart
           sleep 15 # Give nsqd a bit of time to start up.
         end
+        restart
       end
 
 			desc "Starts the NSQ daemons"
@@ -74,10 +71,6 @@ namespace :rubber do
 		namespace :admin do
 			rubber.allow_optional_tasks(self)
 
-			before "deploy:stop", "rubber:nsq:admin:stop"
-			after "deploy:start", "rubber:nsq:admin:start"
-			after "deploy:restart", "rubber:nsq:admin:restart"
-
 			after "rubber:bootstrap", "rubber:nsq:admin:bootstrap"
 
       task :bootstrap, :roles => :nsq_admin do
@@ -86,28 +79,28 @@ namespace :rubber do
           rubber.update_code_for_bootstrap
           rubber.run_config(:file => "role/nsq_admin/", :force => true, :deploy_path => release_path)
 
-          restart
           sleep 15 # Give nsqd a bit of time to start up.
         end
+        restart
       end
 
 			desc "Start the NSQ admin service"
-			task :start, :role => :nsq_admin do
+			task :start, :roles => :nsq_admin do
 				rsudo "service nsqadmin start"
 			end
 
 			desc "Stop the NSQ admin service"
-			task :stop, :role => :nsq_admin do
+			task :stop, :roles => :nsq_admin do
 				rsudo "service nsqadmin stop || true"
 			end
 
 			desc "Force stop the NSQ admin service"
-			task :force_stop, :role => :nsq_admin do
+			task :force_stop, :roles => :nsq_admin do
 				rsudo "kill -9 `cat #{nsq_lookupd_pid_file}"
 			end
 
 			desc "Restart the NSQ admin service"
-			task :restart, :role => :nsq_admin do
+			task :restart, :roles => :nsq_admin do
 				stop
 				start
 			end

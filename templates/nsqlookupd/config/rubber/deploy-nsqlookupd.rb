@@ -6,10 +6,6 @@ namespace :rubber do
 		namespace :lookupd do
 			rubber.allow_optional_tasks(self)
 
-			before "deploy:stop", "rubber:nsq:lookupd:stop"
-			after "deploy:start", "rubber:nsq:lookupd:start"
-			after "deploy:restart", "rubber:nsq:lookupd:restart"
-
 			after "rubber:install_packages", "rubber:nsq:lookupd:install"
 
 	    task :install, :roles => :nsqlookupd do
@@ -37,7 +33,7 @@ namespace :rubber do
 	    end
 
 	    after "rubber:bootstrap", "rubber:nsq:lookupd:bootstrap"
-
+	    
 			task :bootstrap, :roles => :nsqlookupd do
         exists = capture("echo $(ls /etc/nsqlookupd.conf 2> /dev/null)")
         if exists.strip.size == 0
@@ -50,22 +46,22 @@ namespace :rubber do
       end
 
 			desc "Start the NSQ lookup daemon"
-			task :start, :role => :nsqlookupd do
+			task :start, :roles => :nsqlookupd do
 				rsudo "service nsqlookupd start"
 			end
 
 			desc "Stop the NSQ lookup daemon"
-			task :stop, :role => :nsqlookupd do
+			task :stop, :roles => :nsqlookupd do
 				rsudo "service nsqlookupd stop || true"
 			end
 
 			desc "Force stop the NSQ lookup daemon"
-			task :force_stop, :role => :nsqlookupd do
+			task :force_stop, :roles => :nsqlookupd do
 				rsudo "kill -9 `cat #{nsq_lookupd_pid_file}"
 			end
 
 			desc "Restart the NSQ lookup daemon"
-			task :restart, :role => :nsqlookupd do
+			task :restart, :roles => :nsqlookupd do
 				stop
 				start
 			end
