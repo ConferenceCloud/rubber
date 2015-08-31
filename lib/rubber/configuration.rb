@@ -50,6 +50,8 @@ module Rubber
 
       def load
         config = @environment.bind()
+        Rubber.cloud_provider = config['cloud_provider']
+        Rubber.cloud_provider_env = config['cloud_providers'][Rubber.cloud_provider]
         instance_storage = config['instance_storage']
         instance_storage_backup = config['instance_storage_backup']
         instance_storage ||= "file:#{@root}/instance-#{@env}.yml"

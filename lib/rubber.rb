@@ -5,11 +5,17 @@ require 'monitor'
 module Rubber
   extend MonitorMixin
 
+  class << self; attr_accessor :cloud_provider; end
+  class << self; attr_accessor :cloud_provider_env; end
+
   def self.initialize(project_root, project_env)
     return if defined?(RUBBER_ROOT) && defined?(RUBBER_ENV)
 
     @config = nil
     @instances = nil
+
+    # @cloud_provider = nil
+    # @cloud_provider_env = nil
 
     @@root = project_root
     @@env = project_env
@@ -78,7 +84,7 @@ module Rubber
   def self.cloud(capistrano = nil)
     # sharing a Net::HTTP instance across threads doesn't work, so
     # create a new instance per thread
-    Rubber::ThreadSafeProxy.new { Rubber::Cloud::get_provider(self.config.cloud_provider || "aws", self.config, capistrano) }
+    Rubber::ThreadSafeProxy.new { Rubber::Cloud::get_provider(self.cloud_provider || "aws", nil, capistrano, self.cloud_provider_env) }
   end
 
   def self.reset
