@@ -1,0 +1,3 @@
+description: The NSQ queue system
+dependent_templates:
+  - nsqlookupd
