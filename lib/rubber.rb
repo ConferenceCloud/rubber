@@ -14,9 +14,6 @@ module Rubber
     @config = nil
     @instances = nil
 
-    # @cloud_provider = nil
-    # @cloud_provider_env = nil
-
     @@root = project_root
     @@env = project_env
     Object.const_set(:RUBBER_ENV, project_env)
@@ -80,7 +77,7 @@ module Rubber
 
     @instances
   end
-  
+
   def self.cloud(capistrano = nil)
     # sharing a Net::HTTP instance across threads doesn't work, so
     # create a new instance per thread
@@ -98,7 +95,7 @@ module Rubber
       @config = nil
     end
   end
-  
+
 end
 
 require 'rubber/version'
